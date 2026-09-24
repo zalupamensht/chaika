@@ -728,6 +728,19 @@ document.getElementById('ai-key-save').addEventListener('click', function(){
   document.getElementById('ai-key-change').hidden = false;
 });
 
+(function(){
+  const params = new URLSearchParams(location.hash.slice(1));
+  const key = (params.get('key')||'').trim();
+  if(!key) return;
+  setStored('econ-or-key', key);
+  const model = (params.get('model')||'').trim();
+  if(model) setStored('econ-or-model', model);
+  aiSampleNS = null;
+  // Remove the key from the address bar so it doesn't linger in history or get re-shared.
+  try{ history.replaceState(null, '', location.pathname + location.search); }catch(e){}
+  document.getElementById('ai-key-change').hidden = false;
+})();
+
 const aiSession = {count:0, correct:0, current:null, wrongPending:[], followupQueue:[]};
 
 let aiRange = {from:1, to:TICKETS.length};
