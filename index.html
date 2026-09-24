@@ -1,0 +1,1015 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Билеты: экономика предприятия</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600;6..72,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff;
+    --surface:#ffffff;
+    --surface-2:#f0f0f0;
+    --ink:#111111;
+    --ink-soft:#666666;
+    --rule:#111111;
+    --accent:#111111;
+    --accent-ink:#ffffff;
+    --accent-bg:#111111;
+    --good:#ffffff;
+    --good-bg:#111111;
+    --bad:#ffffff;
+    --bad-bg:#111111;
+    --shadow: 0 1px 2px rgba(0,0,0,.06), 0 10px 20px rgba(0,0,0,.07);
+  }
+  :root[data-theme="dark"]{
+    --bg:#0a0a0a;
+    --surface:#0a0a0a;
+    --surface-2:#1c1c1c;
+    --ink:#f2f2f2;
+    --ink-soft:#9a9a9a;
+    --rule:#f2f2f2;
+    --accent:#f2f2f2;
+    --accent-ink:#0a0a0a;
+    --accent-bg:#f2f2f2;
+    --good:#0a0a0a;
+    --good-bg:#f2f2f2;
+    --bad:#0a0a0a;
+    --bad-bg:#f2f2f2;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 26px rgba(0,0,0,.5);
+  }
+
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', system-ui, sans-serif;
+    padding-inline:16px;
+    padding-block:20px;
+    display:flex;
+    justify-content:center;
+  }
+  *{box-sizing:border-box;}
+  .wrap{width:100%;max-width:640px;display:flex;flex-direction:column;gap:16px;}
+
+  header{
+    position:sticky;
+    top:env(safe-area-inset-top,0px);
+    z-index:5;
+    background:var(--bg);
+    padding-block:4px 2px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .title-row{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;}
+  h1{
+    font-family:'Newsreader', Georgia, serif;
+    font-size:26px;
+    font-weight:600;
+    margin:0;
+    letter-spacing:.2px;
+  }
+  .eyebrow{
+    font-size:11px;
+    letter-spacing:.09em;
+    text-transform:uppercase;
+    color:var(--accent-ink);
+    background:var(--accent-bg);
+    border:1px solid var(--accent);
+    border-radius:999px;
+    padding:3px 10px;
+    font-weight:600;
+    white-space:nowrap;
+  }
+
+  .stats{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+  }
+  .stat{
+    background:var(--surface);
+    border:1px solid var(--rule);
+    border-radius:10px;
+    padding:8px 10px;
+    box-shadow:var(--shadow);
+  }
+  .stat b{
+    display:block;
+    font-family:'IBM Plex Mono', monospace;
+    font-variant-numeric:tabular-nums;
+    font-size:18px;
+  }
+  .stat span{font-size:11px;color:var(--ink-soft);}
+
+  .tabs{
+    display:flex;
+    gap:6px;
+    background:var(--surface-2);
+    border-radius:12px;
+    padding:4px;
+  }
+  .tab{
+    flex:1;
+    text-align:center;
+    padding:9px 6px;
+    border-radius:9px;
+    font-size:13px;
+    font-weight:600;
+    color:var(--ink-soft);
+    cursor:pointer;
+    border:none;
+    background:transparent;
+    font-family:inherit;
+  }
+  .tab.active{background:var(--surface);color:var(--ink);box-shadow:var(--shadow);}
+
+  section{display:none;flex-direction:column;gap:14px;}
+  section.active{display:flex;}
+
+  /* Flashcards */
+  .progress-bar{
+    height:6px;
+    border-radius:999px;
+    background:var(--surface-2);
+    overflow:hidden;
+  }
+  .progress-bar > i{
+    display:block;height:100%;background:var(--ink);border-radius:999px;
+    transition:width .3s ease;
+  }
+  .card-counter{font-size:12px;color:var(--ink-soft);display:flex;justify-content:space-between;}
+  .flip-zone{perspective:1200px;}
+  .card{
+    position:relative;
+    min-height:230px;
+    border-radius:16px;
+    cursor:pointer;
+    box-shadow:var(--shadow);
+  }
+  .card-face{
+    position:absolute;inset:0;
+    border-radius:16px;
+    border:1px solid var(--rule);
+    background:var(--surface);
+    padding:22px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    gap:10px;
+    backface-visibility:hidden;
+    transition:transform .45s cubic-bezier(.4,.2,.2,1);
+  }
+  .card-face.back{
+    transform:rotateY(180deg);
+    overflow-y:auto;
+    justify-content:flex-start;
+    padding-top:26px;
+  }
+  .card.flipped .card-face.front{transform:rotateY(-180deg);}
+  .card.flipped .card-face.back{transform:rotateY(0deg);}
+  .card-label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-soft);font-weight:600;}
+  .card-term{font-family:'Newsreader',Georgia,serif;font-size:23px;font-weight:600;text-align:center;line-height:1.25;text-wrap:balance;}
+  .card-def{font-size:14.5px;line-height:1.55;color:var(--ink);white-space:pre-line;}
+  .tap-hint{position:absolute;bottom:10px;right:14px;font-size:10.5px;color:var(--ink-soft);}
+
+  .card-actions{display:grid;grid-template-columns:auto 1fr 1fr;gap:10px;}
+  button.act{
+    font-family:inherit;
+    font-size:14px;
+    font-weight:600;
+    padding:12px 10px;
+    border-radius:10px;
+    border:1px solid var(--rule);
+    background:var(--surface);
+    color:var(--ink);
+    cursor:pointer;
+  }
+  button.act.back{color:var(--ink-soft);padding-inline:14px;}
+  button.act.back:disabled{opacity:.35;cursor:default;}
+  button.act.repeat{color:var(--ink);border-color:var(--ink);background:var(--surface);border-style:dashed;}
+  button.act.know{color:var(--good);border-color:var(--good-bg);background:var(--good-bg);}
+  button.act:active{transform:scale(.98);}
+  .reset-link{
+    align-self:center;font-size:12px;color:var(--ink-soft);
+    text-decoration:underline;cursor:pointer;background:none;border:none;font-family:inherit;
+  }
+  .done-banner{
+    background:var(--good-bg);color:var(--good);border:1px solid var(--good-bg);
+    border-radius:14px;padding:20px;text-align:center;font-weight:600;
+  }
+
+  /* Quiz */
+  .quiz-head{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;color:var(--ink-soft);}
+  .quiz-head b{font-family:'IBM Plex Mono',monospace;color:var(--ink);font-variant-numeric:tabular-nums;}
+  .q-term{
+    background:var(--surface);border:1px solid var(--rule);border-radius:14px;
+    padding:20px;box-shadow:var(--shadow);
+  }
+  .q-term .card-label{margin-bottom:6px;}
+  .q-term .card-term{font-size:20px;}
+  .options{display:flex;flex-direction:column;gap:9px;}
+  .opt{
+    text-align:left;font-family:inherit;font-size:13.5px;line-height:1.4;
+    padding:12px 14px;border-radius:11px;border:1px solid var(--rule);
+    background:var(--surface);color:var(--ink);cursor:pointer;
+  }
+  .opt:disabled{cursor:default;}
+  .opt.correct{background:var(--good-bg);border-color:var(--good-bg);color:var(--good);font-weight:600;}
+  .opt.wrong{background:var(--surface);border-color:var(--ink);border-style:dashed;color:var(--ink);text-decoration:line-through;}
+  .quiz-nav{display:grid;grid-template-columns:auto 1fr;gap:10px;}
+  .next-btn{
+    font-family:inherit;font-weight:600;font-size:14px;padding:12px;border-radius:10px;
+    border:1px solid var(--accent);background:var(--accent-bg);color:var(--accent-ink);cursor:pointer;
+  }
+  .next-btn:disabled{opacity:.4;cursor:default;}
+  .back-btn{
+    font-family:inherit;font-weight:600;font-size:14px;padding:12px 16px;border-radius:10px;
+    border:1px solid var(--rule);background:var(--surface);color:var(--ink-soft);cursor:pointer;
+  }
+  .back-btn:disabled{opacity:.35;cursor:default;}
+  .quiz-summary{
+    background:var(--surface);border:1px solid var(--rule);border-radius:14px;padding:20px;
+    display:flex;flex-direction:column;gap:12px;box-shadow:var(--shadow);
+  }
+  .quiz-summary h2{font-family:'Newsreader',serif;font-size:22px;margin:0;}
+  .miss-list{display:flex;flex-direction:column;gap:6px;font-size:13px;}
+  .miss-list li{list-style:none;padding:8px 10px;border-radius:8px;background:var(--surface-2);color:var(--ink);border:1px dashed var(--ink);}
+
+  /* All tickets list */
+  .search{
+    width:100%;padding:11px 14px;border-radius:10px;border:1px solid var(--rule);
+    background:var(--surface);color:var(--ink);font-family:inherit;font-size:14px;
+  }
+  .search::placeholder{color:var(--ink-soft);}
+  .ticket{
+    background:var(--surface);border:1px solid var(--rule);border-radius:12px;
+    box-shadow:var(--shadow);
+  }
+  .ticket summary{
+    list-style:none;cursor:pointer;padding:13px 16px;display:flex;align-items:baseline;gap:10px;
+    font-family:'Newsreader',serif;font-size:16px;font-weight:600;
+  }
+  .ticket summary::-webkit-details-marker{display:none;}
+  .ticket summary .num{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--accent-ink);background:var(--accent-bg);border-radius:6px;padding:2px 6px;flex:none;}
+  .ticket .body{padding:0 16px 15px;font-size:13.5px;line-height:1.55;color:var(--ink-soft);white-space:pre-line;border-top:1px solid var(--rule);padding-top:10px;}
+
+  /* AI tutor */
+  .ai-note{font-size:13px;line-height:1.55;color:var(--ink-soft);}
+  .ai-intro{
+    background:var(--surface);border:1px solid var(--rule);border-radius:14px;
+    padding:20px;display:flex;flex-direction:column;gap:12px;box-shadow:var(--shadow);
+  }
+  .ai-intro h2{font-family:'Newsreader',serif;font-size:20px;margin:0;}
+  #ai-answer{
+    width:100%;min-height:96px;padding:12px 14px;border-radius:12px;border:1px solid var(--rule);
+    background:var(--surface);color:var(--ink);font-family:inherit;font-size:14px;line-height:1.5;resize:vertical;
+  }
+  #ai-answer:focus{outline:2px solid var(--accent);outline-offset:1px;}
+  .ai-verdict{border-radius:12px;padding:14px 16px;font-size:13.5px;line-height:1.55;}
+  .ai-verdict b{display:block;margin-bottom:4px;text-transform:uppercase;font-size:11px;letter-spacing:.06em;}
+  .ai-verdict.good{background:var(--good-bg);color:var(--good);border:1px solid var(--good-bg);}
+  .ai-verdict.bad{background:var(--bad-bg);color:var(--bad);border:1px dashed var(--ink);text-decoration-line:none;}
+  .range-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;color:var(--ink-soft);}
+  .range-row input{
+    width:56px;padding:8px 9px;border-radius:8px;border:1px solid var(--rule);
+    background:var(--surface);color:var(--ink);font-family:'IBM Plex Mono',monospace;font-size:14px;text-align:center;
+  }
+  .hint-card{
+    background:var(--surface);border:1px solid var(--rule);border-radius:16px;
+    padding:20px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;
+  }
+  .hint-card b{color:var(--ink);}
+  .hint-card.pop-in{animation:pop-in .18s ease-out;}
+  @keyframes pop-in{
+    from{opacity:0;transform:translateY(-4px) scale(.98);}
+    to{opacity:1;transform:none;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .hint-card.pop-in{animation:none;}
+  }
+
+  footer{text-align:center;font-size:11px;color:var(--ink-soft);padding-block:10px 4px;}
+</style>
+<style>body{margin:0;font-size:14px}</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header>
+    <div class="title-row">
+      <h1>Билеты предприятия</h1>
+      <span class="eyebrow">32 билета · экономика предприятия</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><b id="stat-learned">0/32</b><span>выучено карточек</span></div>
+      <div class="stat"><b id="stat-best">—</b><span>лучший тест</span></div>
+      <div class="stat"><b id="stat-left">32</b><span>осталось повторить</span></div>
+    </div>
+    <button class="back-btn" id="reset-all" style="width:100%;">Сбросить весь прогресс (карточки, тест, ИИ)</button>
+    <div class="tabs">
+      <button class="tab active" data-tab="cards">Карточки</button>
+      <button class="tab" data-tab="quiz">Тест</button>
+      <button class="tab" data-tab="ai">ИИ-репетитор</button>
+      <button class="tab" data-tab="list">Все билеты</button>
+    </div>
+  </header>
+
+  <section id="tab-cards" class="active">
+    <div class="progress-bar"><i id="cards-progress"></i></div>
+    <div class="card-counter"><span id="cards-pos">—</span><span id="cards-remaining"></span></div>
+    <div id="cards-area"></div>
+  </section>
+
+  <section id="tab-quiz">
+    <div id="quiz-area"></div>
+  </section>
+
+  <section id="tab-ai">
+    <div class="ai-intro" id="ai-intro">
+      <h2>Живой опрос с Claude</h2>
+      <p class="ai-note">Claude сам придумывает вопрос по одному из твоих билетов в той же прямой формулировке, что и на экзамене — не готовую фразу из Quizlet. Ты отвечаешь текстом, Claude проверяет по смыслу и чаще возвращается к билетам, где ты ошибаешься.</p>
+      <div class="range-row">
+        <label for="range-from">Спрашивать билеты с</label>
+        <input type="number" id="range-from" min="1" max="32" value="1">
+        <label for="range-to">по</label>
+        <input type="number" id="range-to" min="1" max="32" value="32">
+      </div>
+      <button class="next-btn" id="ai-start">Начать опрос</button>
+    </div>
+    <div class="ai-chat" id="ai-chat" hidden style="display:flex;flex-direction:column;gap:14px;">
+      <button class="reset-link" id="ai-exit" style="align-self:flex-start;">← Выйти из опроса</button>
+      <div class="quiz-head"><span>Вопрос <b id="ai-count">1</b></span><span id="ai-range-note"></span><span>Точных ответов: <b id="ai-score">0</b></span></div>
+      <div class="q-term" id="ai-question-card"></div>
+      <div class="hint-card" id="ai-hint-card" hidden></div>
+      <textarea id="ai-answer" placeholder="Напиши ответ своими словами…" hidden></textarea>
+      <div id="ai-feedback"></div>
+      <div class="hint-card" id="ai-teach-card" hidden></div>
+      <div class="quiz-nav" style="grid-template-columns:auto auto 1fr;">
+        <button class="back-btn" id="ai-hint" hidden>Карточка с ответом</button>
+        <button class="back-btn" id="ai-skip">Пропустить</button>
+        <button class="next-btn" id="ai-submit" hidden>Ответить</button>
+      </div>
+      <div class="quiz-nav" id="ai-fix-row" hidden>
+        <button class="back-btn" id="ai-teach">Разобрать и выучить</button>
+        <button class="next-btn" id="ai-retry">Ответить ещё раз</button>
+      </div>
+      <div class="quiz-nav" id="ai-after-row" hidden style="grid-template-columns:auto 1fr;">
+        <button class="back-btn" id="ai-repeat">Повторить этот же вопрос</button>
+        <button class="next-btn" id="ai-next" hidden>Следующий вопрос</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="tab-list">
+    <input class="search" id="search" placeholder="Найти по слову в билете…">
+    <div id="list-area" style="display:flex;flex-direction:column;gap:10px;"></div>
+  </section>
+
+  <footer>Держись — материал весь тут, по одному билету за раз. Удачи на экзамене.</footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+const TICKETS = [
+["Структура финансового оборота","Финансовый оборот — это циклическое движение денежных средств предприятия, обслуживающих процесс производства и реализации продукции.\nПервая фаза (производство и реализация): денежные средства превращаются в производственные ресурсы (внеоборотные и оборотные активы, персонал), затем в незавершенное производство, готовую продукцию и дебиторскую задолженность. Завершается фазой получения выручки от реализации.\nВторая фаза (использование выручки): из выручки возмещаются потребленные ресурсы (фонд возмещения), уплачиваются налоги, а остаточная прибыль направляется на развитие предприятия. Основной источник финансирования текущей деятельности — выручка от реализации, помимо уставного капитала."],
+["Производственные ресурсы","Производственные ресурсы — это основа производственного процесса и объекты финансирования. Включают имущество и персонал предприятия.\nИмущество делится на:\nВнеоборотные активы: основные средства, нематериальные активы, капитальные вложения, долгосрочные финансовые вложения, доходные вложения в материальные ценности.\nОборотные активы: производственные запасы, незавершенное производство, готовая продукция, дебиторская задолженность, краткосрочные вложения, свободные денежные средства."],
+["Источники финансирования","Делятся на собственные и заемные.\nСобственные: уставный капитал, добавочный капитал, резервный капитал, фонды износа (амортизация), нераспределенная прибыль, оценочные резервы.\nЗаемные: кредиты банков, займы, кредиторская задолженность (по налогам, по оплате труда, поставщикам и др.). Существуют также «устойчивые пассивы» (например, задолженность по зарплате) — средства, приравненные к собственным."],
+["Внеоборотные активы","Имущество со сроком использования не менее года (длительный жизненный цикл). Общая черта — перенос стоимости на издержки через амортизацию. Доля в имуществе крупных предприятий достигает 70-90%. Включают: основные средства, нематериальные активы, доходные вложения в материальные ценности, долгосрочные финансовые вложения, капитальные вложения (незавершенное строительство), отложенные налоговые активы."],
+["Основные средства","Актив, который: имеет материально-вещественную форму; используется >12 месяцев; способен приносить доход. Учитываются по инвентарным объектам. Характеристики: срок полезного использования (СПИ), первоначальная стоимость, ликвидационная стоимость, способ амортизации. Поступают через покупку, капитальные вложения, вклад в уставный капитал, безвозмездную передачу, аренду. Выбытие оформляется актом."],
+["Амортизация основных средств","Амортизация — механизм постепенного переноса стоимости изношенной части ОС на себестоимость продукции для накопления средств на воспроизводство. Начисляется так, чтобы к концу СПИ балансовая стоимость стала равной ликвидационной.\nСпособы (ФСБУ 6/2020):\nЛинейный: равномерное погашение разницы между балансовой и ликвидационной стоимостью.\nУменьшаемого остатка: суммы амортизации уменьшаются по мере истечения СПИ.\nПропорционально объему продукции (работ): исходя из натурального показателя объема продукции в отчетном периоде."],
+["Способы начисления амортизации","Способы (ФСБУ 6/2020):\nЛинейный: равномерное погашение разницы между балансовой и ликвидационной стоимостью.\nУменьшаемого остатка: суммы амортизации уменьшаются по мере истечения СПИ.\nПропорционально объему продукции (работ): исходя из натурального показателя объема продукции в отчетном периоде."],
+["Оценка основных средств","Используются натуральные (для технического состава) и стоимостные (для динамики, износа, себестоимости) единицы.\nМетоды стоимостной оценки:\nПо первоначальной стоимости (не изменяется, кроме случаев по ФСБУ 6/2020).\nПо переоцененной стоимости (регулярная переоценка до справедливой стоимости, с пересчетом стоимости и амортизации).\nПереоценка может быть в виде уценки или дооценки"],
+["Нематериальные активы","Иммобилизованные фонды без натурально-вещественной формы, сроком >12 месяцев, приносящие доход или создающие условия для него. Примеры: исключительные права на изобретения, товарные знаки, деловая репутация. Поступают как вклад в УК, безвозмездно, путем приобретения или создания. Амортизируются линейно, способом уменьшаемого остатка или пропорционально объему продукции. Если СПИ определить нельзя — норма на 20 лет."],
+["Аренда и лизинг имущества","Аренда — имущественный наем за плату. Виды: по объектам (оборудование, здания), по сроку (долго-, средне-, краткосрочная), с выкупом или без.\nЛизинг — вид аренды с правом последующего выкупа. Классическая схема: производитель → лизинговая фирма (лизингодатель) → лизингополучатель. Могут участвовать банки и страховые компании. Платеж включает: амортизацию, плату за кредитные ресурсы, комиссионное вознаграждение, доп. услуги, НДС."],
+["Оборотные активы","Жизненный цикл ≤12 месяцев. Состав: материально-производственные запасы (МПЗ), незавершенное производство, готовая продукция, товары, расходы будущих периодов, средства в расчетах (дебиторская задолженность), краткосрочные вложения, свободные денежные средства. Делятся на оборотные фонды (сфера производства) и фонды обращения (сфера обращения). Источники финансирования: собственные, приравненные к собственным (устойчивые пассивы), заемные (краткосрочные кредиты)."],
+["Нормирование оборотных активов","Цель — обеспечить непрерывность производства при минимальном запасе оборотных средств (ОС). Норматив ОС — минимальная потребность в ОС.\nМетоды:\nПрямого счета: Норматив = Норма запаса (дни) × Среднедневной расход. Детально по каждому элементу.\nУкрупненный: на основе удельного расхода элемента ОС на единицу базового показателя (менее точен, для бизнес-планов). Совокупный норматив = сумма частных нормативов."],
+["Показатели эффективности использования основных фондов","Фондоотдача: объем продукции на 1 руб. стоимости ОС.\nФондоемкость: обратный показатель (руб. ОС на 1 руб. продукции).\nФондовооруженность: отношение среднегодовой стоимости ОС к численности работающих.\nРентабельность ОС: прибыль / среднегодовую стоимость ОС.\nКоэффициенты: обновления, выбытия, экстенсивного использования (по времени), интенсивного использования (по мощности), интегральный (произведение двух предыдущих)."],
+["Показатели эффективности использования оборотных средств","Основной показатель — скорость оборота:\nКоэффициент оборачиваемости (Коб): РП (выручка) / среднегодовой запас ОС. Показывает число оборотов в год.\nДлительность одного оборота (Тоб): 360 / Коб (дни). Ускорение оборачиваемости ведет к экономии (высвобождению) ОС и позволяет выпускать больше продукции с той же суммой ОС."],
+["Персонал предприятия","Физические лица, участвующие трудом в деятельности предприятия.\nКлассификация: по категориям (рабочие, служащие), по сферам деятельности (занятые в основной деятельности — их зарплата в себестоимости; занятые в неосновной — за счет прибыли), по месту работы (состоящие в штате и не состоящие). Режим работы определяется предприятием. Показатель эффективности — производительность труда (объем продукции на одного работающего)."],
+["Тарифная система оплаты труда","Совокупность норм для дифференциации оплаты труда в зависимости от сложности, условий, интенсивности.\nЭлементы:\nТарифно-квалификационные справочники (ЕТКС).\nТарифные ставки (размер оплаты за единицу времени, 1-й разряд не ниже МРОТ).\nТарифные сетки (разряды и коэффициенты, например, 18 разрядов для бюджетной сферы).\nРайонные коэффициенты и надбавки (за работу в особых климатических условиях).\nДоплаты и надбавки за отклонения от нормальных условий."],
+["Оплата труда. Ее основные формы и системы","Сдельная форма — оплата за количество и качество продукции (прямая сдельная, сдельно-премиальная, сдельно-прогрессивная, косвенно-сдельная, аккордная, аккордно-премиальная, коллективная).\nПовременная форма — оплата за отработанное время (простая повременная, повременно-премиальная, окладная, контрактная). Формы и системы предприятия устанавливают самостоятельно, но не ниже МРОТ."],
+["Бестарифные системы оплаты труда, сфера их применения","Заработок работника зависит от его доли в общем фонде оплаты труда подразделения или предприятия.\nПримеры:\nНа основе квалификационного уровня (балла) и КТУ (коэффициента трудового участия).\nНа основе коэффициента трудовой стоимости (РКСТ): зарплата за прошлые периоды / отработанные дни → коэффициент → умножается на отработанные дни в текущем месяце.\nСистема «плавающих окладов»: оклад меняется в зависимости от роста/снижения ключевых показателей (прибыль, производительность)."],
+["Виды затрат","Текущие — повторяются, связаны с деятельностью (делятся на включаемые и не включаемые в себестоимость).\nКапитальные — разовые, на создание и развитие предприятия.\nПо способу включения в себестоимость: прямые (можно прямо отнести на вид продукции) и косвенные (накладные) — требуют распределения.\nПо зависимости от объема производства: условно-переменные (изменяются с объемом) и условно-постоянные (не зависят от объема)."],
+["Точка безубыточности","Объем продаж, при котором выручка покрывает все затраты, а прибыль = 0.\nПоказатели:\nКритический объем продаж (шт.) = Постоянные расходы / (Цена − Средние переменные затраты на ед.).\nПорог рентабельности (руб.) = Критический объем × Цена.\nЗапас финансовой прочности (руб.) = Выручка от реализации − Порог рентабельности."],
+["Себестоимость продукции","Стоимостная оценка используемых в процессе производства ресурсов (природных, сырья, материалов, топлива, энергии, ОС, трудовых) и других затрат на производство и реализацию.\nРассчитывается двумя способами:\nПо экономическим элементам (материальные затраты, оплата труда, отчисления на соцнужды, амортизация, прочие) — для всей продукции.\nПо статьям калькуляции (материалы, покупные изделия, топливо на технологические цели, оплата труда, общепроизводственные расходы и т.д.) — для единицы продукции."],
+["Способы группировки и включения затрат в себестоимость реализованных товаров, продукции, работ, услуг","Разрешены два способа:\nТрадиционный (формирование полной себестоимости): расходы делятся на прямые и косвенные (накладные). Косвенные распределяются между видами продукции и включаются в себестоимость полностью.\n«Директ-костинг» (формирование сокращенной себестоимости): затраты делятся на условно-переменные (формируют себестоимость) и условно-постоянные (списываются непосредственно на финансовый результат отчетного периода). Позволяет рассчитать маржинальный доход и управлять прибылью."],
+["Показатели, характеризующие эффективность затрат","Затраты на 1 рубль товарной продукции = Себестоимость ТП / Объем ТП в ценах нетто.\nЗатраты на 1 рубль объема продаж = Полная себестоимость проданной продукции / Выручка-нетто.\nРентабельность продукции = Прибыль от продаж / Полная себестоимость.\nРентабельность продаж = Прибыль от продаж / Выручка-нетто.\nРентабельность деятельности = Прибыль до налогообложения / (Полная себестоимость + Прочие расходы и проценты к уплате)."],
+["Ценообразование в рыночных условиях","Цена — денежное выражение стоимости товара. Должна компенсировать затраты и обеспечить прибыль.\nФункции: учетная, стимулирующая, регулирующая, распределительная.\nМетоды ценообразования:\nНа основе издержек (затратный подход) — самый распространенный (50% случаев). Ц = С + П + косвенные налоги. Определяет нижний предел цены.\nОриентированные на спрос — на основе полезности для потребителя.\nОриентированные на конкуренцию — на основе цен конкурентов (тендеры, следование за лидером)."],
+["Дифференциация цен","Классификация по разным признакам:\nПо степени участия государства: фиксированные, регулируемые, договорные, свободные (рыночные, в т.ч. монопольные и демпинговые).\nПо стадиям ценообразования: цена нетто (производителя), отпускная (+ акциз, НДС), оптовая торгово-закупочной организации (+ надбавка), розничная (+ торговая наценка).\nПо характеру информации: цены фактических сделок (твердые, скользящие), аукционные, биржевые, справочные."],
+["Методы ценообразования","(Дополнение к вопросу о ценообразовании)\nКонкретные затратные методы:\nМетод полных издержек: к полной себестоимости прибавляется норматив рентабельности.\nМетод предельных издержек: на основе только переменных затрат (для цены на доп. продукцию).\nДля определения верхнего предела:\nМетод учета экономической эффективности: Ц = Цена базового изделия + α × Экономический эффект.\nМетод учета технического уровня: Ц = Цена базового изделия × Коэффициент технического уровня (на основе весовых коэффициентов характеристик)."],
+["Страховые взносы (отчисления на социальные нужды)","Входят в себестоимость продукции по элементу «Отчисления на социальные нужды». В 2016 году общий тариф для большинства работодателей составлял 30% от начисленной зарплаты:\nПФР — 22%\nФФОМС — 5,1%\nФСС — 2,9%\nПри превышении предельной базы ставки снижаются. Дополнительно — взносы на травматизм (0,2-10,7%)."],
+["Производственная мощность предприятия","Максимально возможный годовой объем выпуска продукции при эффективном использовании ресурсов и прогрессивной технологии. Рассчитывается в натуральных единицах.\nФормула для однотипного оборудования: М = Nоб × Fэф × kвн / tед.пл.\nВиды: входная (на начало), выходная (на конец), проектная, среднегодовая.\nИспользование: коэффициент загрузки = Q / М (нормально ≈0,8). «Узкие места» расширяют: перераспределением работ, увеличением сменности, новой технологией, арендой, покупкой оборудования."],
+["Производственный результат и его измерение","Производственный результат — изготовленная продукция, работы, услуги (номенклатура, количество, качество).\nПоказатели объема:\nВаловая продукция (ВП) = ТП + Δ остатков незавершенного производства.\nТоварная продукция (ТП) — готовая продукция, предназначенная для реализации.\nРеализованная продукция (РП) — оплаченная продукция (выручка-нетто). РП = ГПн + ТП - ГПк.\nСопоставление ТП и РП показывает проблемы со сбытом (ТП > РП) или активизацию маркетинга (РП > ТП)."],
+["Виды и значение финансового результата","Прибыль — разница между выручкой и расходами. Главный результат, источник самофинансирования, выполнения обязательств перед бюджетом и собственниками.\nВаловой доход — выручка минус материальные и приравненные к ним затраты (не зависит от оплаты труда).\nМаржинальный доход — выручка минус переменные затраты (рассчитывается при «директ-костинге»). Отрицательный результат — убыток."],
+["Формирование и расчет показателей финансовых результатов","Модель формирования (форма №2 бухгалтерской отчетности):\nВыручка-нетто (от продаж).\n- Себестоимость проданной продукции = Валовая прибыль.\n- Коммерческие и управленческие расходы = Прибыль (убыток) от продаж.\n± Сальдо прочих доходов и расходов = Прибыль до налогообложения (бухгалтерская прибыль).\n- Налог на прибыль = Чистая прибыль (нераспределенная)."],
+["Использование чистой прибыли предприятием","Чистая прибыль (после уплаты налога на прибыль) используется предприятием самостоятельно. Направления:\nВыплата дивидендов и процентов учредителям.\nОтчисления в резервный капитал (для АО — не менее 5% чистой прибыли до 15% УК).\nФинансирование капитальных вложений (производственная и непроизводственная сфера).\nОбразование фондов накопления, потребления, социальной сферы.\nПогашение кредитов, выплата процентов сверх лимитов, благотворительность.\nНеиспользованная часть — нераспределенная прибыль прошлых лет и отчетного года."]
+].map(function(t,i){return {id:i, term:t[0], def:t[1]};});
+
+let learned = new Set();
+let quizBest = null;
+try{
+  const raw = localStorage.getItem('econ-learned');
+  if(raw) learned = new Set(JSON.parse(raw));
+  const b = localStorage.getItem('econ-quiz-best');
+  if(b) quizBest = JSON.parse(b);
+}catch(e){}
+
+function saveLearned(){ try{ localStorage.setItem('econ-learned', JSON.stringify(Array.from(learned))); }catch(e){} }
+function saveBest(score,total){
+  quizBest = {score:score,total:total};
+  try{ localStorage.setItem('econ-quiz-best', JSON.stringify(quizBest)); }catch(e){}
+}
+
+function refreshStats(){
+  document.getElementById('stat-learned').textContent = learned.size+"/"+TICKETS.length;
+  document.getElementById('stat-left').textContent = (TICKETS.length-learned.size);
+  document.getElementById('stat-best').textContent = quizBest ? (quizBest.score+"/"+quizBest.total) : "—";
+}
+
+document.getElementById('reset-all').addEventListener('click', function(){
+  if(!confirm('Точно сбросить абсолютно весь прогресс — карточки, лучший тест и память ИИ-репетитора? Это нельзя отменить.')) return;
+
+  learned = new Set(); saveLearned();
+  buildQueue(); renderCard();
+
+  quizBest = null;
+  try{ localStorage.removeItem('econ-quiz-best'); }catch(e){}
+  quizStarted = false;
+  document.getElementById('quiz-area').innerHTML = '';
+
+  aiWeak = {}; saveAiWeak();
+  aiRecentlyAsked = [];
+  aiSession.count = 0; aiSession.correct = 0; aiSession.current = null; aiSession.isRetry = false;
+  aiSession.wrongPending = []; aiSession.followupQueue = [];
+  aiRange = {from:1, to:TICKETS.length}; saveAiRange();
+  document.getElementById('ai-chat').hidden = true;
+  document.getElementById('ai-intro').hidden = false;
+  const rf = document.getElementById('range-from'), rt = document.getElementById('range-to');
+  if(rf) rf.value = 1;
+  if(rt) rt.value = TICKETS.length;
+
+  refreshStats();
+});
+
+/* ---------- Tabs ---------- */
+document.querySelectorAll('.tab').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('.tab').forEach(function(b){b.classList.remove('active');});
+    document.querySelectorAll('section').forEach(function(s){s.classList.remove('active');});
+    btn.classList.add('active');
+    document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+    if(btn.dataset.tab==='quiz' && !quizStarted) startQuiz();
+  });
+});
+
+/* ---------- Flashcards ---------- */
+let queue = [];
+let cardIndex = 0;
+
+function buildQueue(){
+  const notLearned = TICKETS.filter(function(t){return !learned.has(t.id);});
+  const rest = TICKETS.filter(function(t){return learned.has(t.id);});
+  queue = notLearned.concat(rest);
+  cardIndex = 0;
+}
+buildQueue();
+
+function renderCard(){
+  const area = document.getElementById('cards-area');
+  refreshStats();
+  document.getElementById('cards-progress').style.width = Math.round(learned.size/TICKETS.length*100)+"%";
+
+  if(queue.length===0){
+    area.innerHTML = '';
+    document.getElementById('cards-pos').textContent='';
+    document.getElementById('cards-remaining').textContent='';
+    return;
+  }
+  if(cardIndex>=queue.length){
+    area.innerHTML = '<div class="done-banner">Круг пройден! Все карточки этого прохода просмотрены — можно пройтись ещё раз или проверить себя в тесте.</div>'+
+      '<div class="card-actions" style="grid-template-columns:auto 1fr;margin-top:10px;">'+
+        '<button class="act back" id="btn-back-end">← Назад</button>'+
+        '<button class="reset-link" id="restart-round">Начать круг сначала</button>'+
+      '</div>';
+    document.getElementById('restart-round').addEventListener('click', function(){ buildQueue(); renderCard(); });
+    document.getElementById('btn-back-end').addEventListener('click', function(){ cardIndex--; renderCard(); });
+    document.getElementById('cards-pos').textContent='';
+    document.getElementById('cards-remaining').textContent='осталось выучить: '+(TICKETS.length-learned.size);
+    return;
+  }
+
+  const t = queue[cardIndex];
+  document.getElementById('cards-pos').textContent = 'Карточка '+(cardIndex+1)+' из '+queue.length;
+  document.getElementById('cards-remaining').textContent = 'осталось выучить: '+(TICKETS.length-learned.size);
+
+  area.innerHTML =
+    '<div class="flip-zone"><div class="card" id="flip-card">'+
+      '<div class="card-face front">'+
+        '<div class="card-label">Билет '+(t.id+1)+'</div>'+
+        '<div class="card-term">'+t.term+'</div>'+
+        '<span class="tap-hint">нажми, чтобы открыть ответ</span>'+
+      '</div>'+
+      '<div class="card-face back">'+
+        '<div class="card-label">Ответ</div>'+
+        '<div class="card-def">'+t.def+'</div>'+
+      '</div>'+
+    '</div></div>'+
+    '<div class="card-actions">'+
+      '<button class="act back" id="btn-back" '+(cardIndex===0?'disabled':'')+'>← Назад</button>'+
+      '<button class="act repeat" id="btn-repeat">Повторить ещё</button>'+
+      '<button class="act know" id="btn-know">Знаю ✓</button>'+
+    '</div>'+
+    '<button class="reset-link" id="reset-progress">Сбросить весь прогресс карточек</button>';
+
+  document.getElementById('flip-card').addEventListener('click', function(){
+    this.classList.toggle('flipped');
+  });
+  document.getElementById('btn-back').addEventListener('click', function(e){
+    e.stopPropagation();
+    if(cardIndex>0){ cardIndex--; renderCard(); }
+  });
+  document.getElementById('btn-repeat').addEventListener('click', function(e){
+    e.stopPropagation();
+    learned.delete(t.id); saveLearned();
+    cardIndex++; renderCard();
+  });
+  document.getElementById('btn-know').addEventListener('click', function(e){
+    e.stopPropagation();
+    learned.add(t.id); saveLearned();
+    cardIndex++; renderCard();
+  });
+  document.getElementById('reset-progress').addEventListener('click', function(){
+    if(confirm('Сбросить весь прогресс по карточкам?')){
+      learned = new Set(); saveLearned(); buildQueue(); renderCard();
+    }
+  });
+}
+renderCard();
+
+/* ---------- Quiz ---------- */
+let quizStarted = false;
+let quizQuestions = [];
+let quizPos = 0;
+
+function shortDef(def){
+  const first = def.split('\n')[0].split(/(?<=[.:])\s/)[0];
+  return first.length>110 ? first.slice(0,107)+'…' : first;
+}
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+
+function startQuiz(){
+  quizStarted = true;
+  const order = shuffle(TICKETS.map(function(t){return t.id;}));
+  quizQuestions = order.map(function(id){
+    const t = TICKETS[id];
+    const distractors = shuffle(TICKETS.filter(function(x){return x.id!==t.id;})).slice(0,3);
+    const options = shuffle([{ticketId:t.id, text:shortDef(t.def), correct:true}]
+      .concat(distractors.map(function(d){return {ticketId:d.id, text:shortDef(d.def), correct:false};})));
+    return {ticketId:t.id, options:options, chosen:null};
+  });
+  quizPos = 0;
+  renderQuiz();
+}
+
+function renderQuiz(){
+  const area = document.getElementById('quiz-area');
+
+  if(quizPos>=quizQuestions.length){
+    const score = quizQuestions.filter(function(q){return q.options[q.chosen] && q.options[q.chosen].correct;}).length;
+    const missed = quizQuestions.filter(function(q){return !(q.options[q.chosen] && q.options[q.chosen].correct);});
+    saveBest(score, quizQuestions.length);
+    refreshStats();
+    let html = '<div class="quiz-summary"><h2>Результат: '+score+' / '+quizQuestions.length+'</h2>';
+    if(missed.length){
+      html += '<div>Стоит повторить:</div><ul class="miss-list">'+
+        missed.map(function(q){return '<li>Билет '+(q.ticketId+1)+' — '+TICKETS[q.ticketId].term+'</li>';}).join('')+
+        '</ul>';
+    } else {
+      html += '<div style="color:var(--ink);font-weight:600;">✓ Все билеты закрыты без ошибок</div>';
+    }
+    html += '<div class="quiz-nav"><button class="back-btn" id="quiz-back-end">← Назад</button>'+
+      '<button class="next-btn" id="quiz-restart">Пройти тест снова</button></div></div>';
+    area.innerHTML = html;
+    document.getElementById('quiz-restart').addEventListener('click', startQuiz);
+    document.getElementById('quiz-back-end').addEventListener('click', function(){ quizPos--; renderQuiz(); });
+    return;
+  }
+
+  const q = quizQuestions[quizPos];
+  const t = TICKETS[q.ticketId];
+  const isAnswered = q.chosen!==null;
+  const score = quizQuestions.slice(0,quizPos).filter(function(x){return x.options[x.chosen] && x.options[x.chosen].correct;}).length;
+
+  area.innerHTML =
+    '<div class="quiz-head"><span>Вопрос <b>'+(quizPos+1)+'</b> из '+quizQuestions.length+'</span><span>Верно: <b>'+score+'</b></span></div>'+
+    '<div class="q-term"><div class="card-label">Билет '+(t.id+1)+' — определение к термину</div><div class="card-term">'+t.term+'</div></div>'+
+    '<div class="options">'+q.options.map(function(o,i){
+      let cls='opt';
+      let prefix='';
+      if(isAnswered){
+        if(o.correct){ cls+=' correct'; prefix='✓ '; }
+        else if(i===q.chosen){ cls+=' wrong'; prefix='✗ '; }
+      }
+      return '<button class="'+cls+'" data-i="'+i+'" '+(isAnswered?'disabled':'')+'>'+prefix+o.text+'</button>';
+    }).join('')+'</div>'+
+    '<div class="quiz-nav">'+
+      '<button class="back-btn" id="quiz-back" '+(quizPos===0?'disabled':'')+'>← Назад</button>'+
+      '<button class="next-btn" id="quiz-next" '+(isAnswered?'':'disabled')+'>Далее</button>'+
+    '</div>';
+
+  if(!isAnswered){
+    document.querySelectorAll('.opt').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        const i = Number(btn.dataset.i);
+        q.chosen = i;
+        renderQuiz();
+      });
+    });
+  }
+  document.getElementById('quiz-back').addEventListener('click', function(){
+    quizPos--; renderQuiz();
+  });
+  document.getElementById('quiz-next').addEventListener('click', function(){
+    quizPos++; renderQuiz();
+  });
+}
+
+/* ---------- AI tutor (Claude generates & grades live) ---------- */
+let aiWeak = {};
+try{
+  const raw = localStorage.getItem('econ-ai-weak');
+  if(raw) aiWeak = JSON.parse(raw);
+}catch(e){}
+function saveAiWeak(){ try{ localStorage.setItem('econ-ai-weak', JSON.stringify(aiWeak)); }catch(e){} }
+
+let aiSampleNS = null;
+async function ensureSample(){
+  if(aiSampleNS) return aiSampleNS;
+  if(!(window.claude && window.claude.use)) return null;
+  aiSampleNS = await window.claude.use('sample');
+  return aiSampleNS;
+}
+
+const aiSession = {count:0, correct:0, current:null, wrongPending:[], followupQueue:[]};
+
+let aiRange = {from:1, to:TICKETS.length};
+try{
+  const raw = localStorage.getItem('econ-ai-range');
+  if(raw){ const r = JSON.parse(raw); if(r && r.from && r.to) aiRange = r; }
+}catch(e){}
+function saveAiRange(){ try{ localStorage.setItem('econ-ai-range', JSON.stringify(aiRange)); }catch(e){} }
+
+function rangeTickets(){
+  let a = Math.min(aiRange.from, aiRange.to);
+  let b = Math.max(aiRange.from, aiRange.to);
+  a = Math.max(1, Math.min(a, TICKETS.length));
+  b = Math.max(1, Math.min(b, TICKETS.length));
+  return TICKETS.filter(function(t){ return (t.id+1)>=a && (t.id+1)<=b; });
+}
+
+let aiRecentlyAsked = [];
+
+function pickWeightedTicket(){
+  const pool = rangeTickets();
+  const cooldown = Math.min(aiRecentlyAsked.length, Math.max(0, pool.length-1));
+  const avoid = new Set(aiRecentlyAsked.slice(-cooldown));
+  let candidates = pool.filter(function(t){ return !avoid.has(t.id); });
+  if(candidates.length===0) candidates = pool;
+
+  const weights = candidates.map(function(t){ return (aiWeak[t.id]||0)*3 + 1; });
+  const total = weights.reduce(function(a,b){return a+b;},0);
+  let r = Math.random()*total;
+  let chosen = candidates[candidates.length-1];
+  for(let i=0;i<candidates.length;i++){
+    r -= weights[i];
+    if(r<=0){ chosen = candidates[i]; break; }
+  }
+
+  aiRecentlyAsked.push(chosen.id);
+  const maxHistory = Math.max(1, pool.length-1);
+  if(aiRecentlyAsked.length>maxHistory) aiRecentlyAsked = aiRecentlyAsked.slice(-maxHistory);
+  return chosen;
+}
+
+const AI_ASK_TEMPLATES = [
+  function(t){ return 'Билет '+(t.id+1)+'. '+t.term+'.'; },
+  function(t){ return 'Раскрой билет: «'+t.term+'».'; },
+  function(t){ return 'Расскажи билет «'+t.term+'».'; },
+  function(t){ return 'Что входит в билет «'+t.term+'»?'; }
+];
+
+document.getElementById('range-from').value = aiRange.from;
+document.getElementById('range-to').value = aiRange.to;
+
+document.getElementById('ai-start').addEventListener('click', async function(){
+  const btn = this;
+  const from = parseInt(document.getElementById('range-from').value, 10) || 1;
+  const to = parseInt(document.getElementById('range-to').value, 10) || TICKETS.length;
+  aiRange = {from:from, to:to};
+  saveAiRange();
+  if(rangeTickets().length===0){
+    alert('В этом диапазоне нет билетов — проверь номера от 1 до '+TICKETS.length+'.');
+    return;
+  }
+  btn.disabled = true; btn.textContent = 'Загрузка…';
+  const sample = await ensureSample();
+  if(!sample){
+    document.getElementById('ai-intro').innerHTML =
+      '<h2>ИИ-репетитор недоступен</h2>'+
+      '<p class="ai-note">Этому окну не дали доступ к Claude. Открой артефакт по его прямой ссылке (не во встроенном предпросмотре) и разреши запрос — тогда опрос заработает.</p>';
+    return;
+  }
+  document.getElementById('ai-intro').hidden = true;
+  document.getElementById('ai-chat').hidden = false;
+  document.getElementById('ai-range-note').textContent = 'билеты '+Math.min(aiRange.from,aiRange.to)+'–'+Math.max(aiRange.from,aiRange.to);
+  aiRecentlyAsked = [];
+  aiSession.wrongPending = [];
+  aiSession.followupQueue = [];
+  nextAiQuestion();
+});
+
+document.getElementById('ai-exit').addEventListener('click', function(){
+  document.getElementById('ai-chat').hidden = true;
+  document.getElementById('ai-intro').hidden = false;
+  const startBtn = document.getElementById('ai-start');
+  if(startBtn){ startBtn.disabled = false; startBtn.textContent = 'Начать опрос'; }
+  aiSession.current = null;
+  aiSession.isRetry = false;
+  aiSession.isFollowup = false;
+  aiSession.followupQueue = [];
+});
+
+function nextAiQuestion(){
+  const answerEl = document.getElementById('ai-answer');
+  answerEl.value=''; answerEl.hidden = true;
+  document.getElementById('ai-submit').hidden = true;
+  document.getElementById('ai-next').hidden = true;
+  document.getElementById('ai-after-row').hidden = true;
+  document.getElementById('ai-skip').hidden = false;
+  document.getElementById('ai-feedback').innerHTML = '';
+  const hintBtn = document.getElementById('ai-hint');
+  hintBtn.hidden = true; hintBtn.textContent = 'Карточка с ответом';
+  const hintCard = document.getElementById('ai-hint-card');
+  hintCard.hidden = true; hintCard.innerHTML = '';
+  document.getElementById('ai-fix-row').hidden = true;
+  document.getElementById('ai-teach-card').hidden = true;
+  document.getElementById('ai-teach-card').innerHTML = '';
+  aiSession.isRetry = false;
+
+  const t = pickWeightedTicket();
+  const question = AI_ASK_TEMPLATES[Math.floor(Math.random()*AI_ASK_TEMPLATES.length)](t);
+  aiSession.current = {ticket:t, question:question};
+  renderAiQuestion();
+}
+
+function renderAiQuestion(isFollowup){
+  const t = aiSession.current.ticket;
+  document.getElementById('ai-count').textContent = String(aiSession.count+1);
+  document.getElementById('ai-score').textContent = String(aiSession.correct);
+  document.getElementById('ai-question-card').innerHTML =
+    '<div class="card-label">'+(isFollowup ? 'Уточняющий вопрос по билету '+(t.id+1) : 'Билет '+(t.id+1)+' · '+t.term)+'</div>'+
+    '<div class="card-term" style="font-size:17px;text-align:left;">'+aiSession.current.question+'</div>';
+  const answerEl = document.getElementById('ai-answer');
+  answerEl.value = '';
+  answerEl.hidden = false;
+  const submit = document.getElementById('ai-submit');
+  submit.hidden = false; submit.textContent = 'Ответить';
+  document.getElementById('ai-hint').hidden = !!isFollowup;
+  document.getElementById('ai-skip').hidden = false;
+  document.getElementById('ai-feedback').innerHTML = '';
+  document.getElementById('ai-fix-row').hidden = true;
+  document.getElementById('ai-next').hidden = true;
+  document.getElementById('ai-after-row').hidden = true;
+  document.getElementById('ai-next').textContent = 'Следующий вопрос';
+}
+
+document.getElementById('ai-hint').addEventListener('click', function(){
+  if(!aiSession.current) return;
+  const hintCard = document.getElementById('ai-hint-card');
+  if(hintCard.hidden){
+    const t = aiSession.current.ticket;
+    hintCard.innerHTML =
+      '<div class="card-label">Билет '+(t.id+1)+' · '+t.term+'</div>'+
+      '<div class="card-def">'+t.def+'</div>';
+    hintCard.hidden = false;
+    hintCard.classList.add('pop-in');
+    this.textContent = 'Скрыть карточку';
+  } else {
+    hintCard.hidden = true;
+    hintCard.classList.remove('pop-in');
+    this.textContent = 'Карточка с ответом';
+  }
+});
+
+document.getElementById('ai-submit').addEventListener('click', async function(){
+  if(this.textContent==='Ответить') { await aiSubmitAnswer(); }
+});
+document.getElementById('ai-skip').addEventListener('click', function(){
+  if(aiSession.followupQueue.length>0){
+    const item = aiSession.followupQueue.shift();
+    aiSession.current = {ticket:item.ticket, question:item.followup_question};
+    aiSession.isRetry = true;
+    aiSession.isFollowup = true;
+    renderAiQuestion(true);
+    return;
+  }
+  aiSession.isFollowup = false;
+  aiSession.count++; nextAiQuestion();
+});
+document.getElementById('ai-next').addEventListener('click', function(){
+  if(this.textContent==='Повторить попытку'){ nextAiQuestion(); return; }
+  if(aiSession.followupQueue.length>0){
+    const item = aiSession.followupQueue.shift();
+    aiSession.current = {ticket:item.ticket, question:item.followup_question};
+    aiSession.isRetry = true;
+    aiSession.isFollowup = true;
+    renderAiQuestion(true);
+    return;
+  }
+  aiSession.isFollowup = false;
+  aiSession.count++; nextAiQuestion();
+});
+
+function restartCurrentQuestion(){
+  document.getElementById('ai-feedback').innerHTML = '';
+  document.getElementById('ai-teach-card').hidden = true;
+  document.getElementById('ai-teach-card').innerHTML = '';
+  document.getElementById('ai-fix-row').hidden = true;
+  document.getElementById('ai-after-row').hidden = true;
+  document.getElementById('ai-next').hidden = true;
+  document.getElementById('ai-answer').value = '';
+  document.getElementById('ai-answer').hidden = false;
+  const submit = document.getElementById('ai-submit');
+  submit.hidden = false; submit.textContent = 'Ответить';
+  document.getElementById('ai-skip').hidden = false;
+  aiSession.isRetry = true;
+}
+
+document.getElementById('ai-retry').addEventListener('click', restartCurrentQuestion);
+document.getElementById('ai-repeat').addEventListener('click', restartCurrentQuestion);
+
+document.getElementById('ai-teach').addEventListener('click', async function(){
+  const btn = this;
+  btn.disabled = true; btn.textContent = 'Объясняю…';
+  const t = aiSession.current.ticket;
+  const question = aiSession.current.question;
+  const teachCard = document.getElementById('ai-teach-card');
+
+  const items = aiSession.wrongPending.length
+    ? aiSession.wrongPending.slice()
+    : [{ticket:t, question:question, userAnswer:aiSession.lastAnswer||'', feedback:aiSession.lastFeedback||''}];
+  aiSession.wrongPending = [];
+
+  try{
+    const sample = await ensureSample();
+    const res = await sample.json(
+      'Ты — терпеливый репетитор по экономике предприятия. Студент недавно ошибся в '+items.length+' вопрос(ах) подряд. Разбери каждый по порядку, отдельно, не смешивая между собой.\n\n'+
+      items.map(function(item,i){
+        return (i+1)+') Билет «'+item.ticket.term+'». Эталонный материал:\n"""'+item.ticket.def+'"""\nВопрос был: "'+item.question+'"\nОтвет студента: "'+(item.userAnswer||'')+'"\nОбратная связь экзаменатора: "'+(item.feedback||'')+'"\n';
+      }).join('\n')+
+      '\nДля каждого пункта по порядку дай:\n'+
+      '- explanation — объяснение так, чтобы запомнилось, а не просто повтори эталонный текст: разбей суть на понятные шаги/блоки, при необходимости короткую аналогию или мнемонику. По-русски, компактно (до 90 слов на пункт), можно короткими пунктами с переносом строки, без markdown-разметки со звёздочками или решётками.\n'+
+      '- followup_question — короткий контрольный вопрос по-русски (1 предложение), который целится именно в то, что упущено по обратной связи этого пункта, а не в билет заново целиком.\n'+
+      'Верни строго JSON без пояснений вокруг, ровно '+items.length+' элементов в том же порядке: {"items":[{"explanation":"...","followup_question":"..."}]}',
+      {modelTier:'default', cache:false}
+    );
+
+    const resultItems = (res && res.items) || [];
+    teachCard.innerHTML = items.map(function(item,i){
+      const exp = (resultItems[i] && resultItems[i].explanation) || '';
+      return '<b>Билет '+(item.ticket.id+1)+' · '+item.ticket.term+': </b>'+exp.replace(/\n/g,'<br>');
+    }).join('<br><br>');
+    teachCard.hidden = false;
+
+    aiSession.followupQueue = items.map(function(item,i){
+      return {ticket:item.ticket, followup_question:(resultItems[i] && resultItems[i].followup_question) || item.question};
+    });
+
+    document.getElementById('ai-fix-row').hidden = true;
+    document.getElementById('ai-next').hidden = true;
+
+    const first = aiSession.followupQueue.shift();
+    aiSession.current = {ticket:first.ticket, question:first.followup_question};
+    aiSession.isRetry = true;
+    aiSession.isFollowup = true;
+    renderAiQuestion(true);
+  }catch(err){
+    teachCard.innerHTML = 'Не получилось объяснить ('+(err&&err.code||'ошибка')+'). Попробуй ещё раз.';
+    teachCard.hidden = false;
+  }finally{
+    btn.disabled = false; btn.textContent = 'Разобрать и выучить';
+  }
+});
+
+async function aiSubmitAnswer(){
+  const answerEl = document.getElementById('ai-answer');
+  const userAnswer = answerEl.value.trim();
+  if(!userAnswer) return;
+  const submit = document.getElementById('ai-submit');
+  submit.disabled = true; submit.textContent = 'Проверяю…';
+  const isRetry = !!aiSession.isRetry;
+
+  const t = aiSession.current.ticket;
+  const question = aiSession.current.question;
+  try{
+    const sample = await ensureSample();
+    const verdict = await sample.json(
+      'Ты — экзаменатор по экономике предприятия, но твоя цель — научить, а не просто оценить. Вопрос был: "'+question+'"\n'+
+      'Эталонный материал билета «'+t.term+'»:\n"""'+t.def+'"""\n\n'+
+      'Ответ студента: "'+userAnswer+'"\n\n'+
+      'Оцени ответ по сути, не по совпадению формулировок. Учитывай, что студент пишет быстро и коротко: '+
+      'он может использовать стандартные сокращения из этого предмета (ОС — основные средства, НМА — нематериальные активы, СПИ — срок полезного использования, МПЗ — материально-производственные запасы, ВП/ТП/РП — валовая/товарная/реализованная продукция, ФОТ — фонд оплаты труда, КТУ — коэффициент трудового участия, УК — уставный капитал, и подобные очевидные из контекста билета сокращения) — не занижай оценку за сокращения вместо полных слов. '+
+      'Он может писать перечисление без запятых, через пробел или с тире вместо запятых, а не строго по правилам пунктуации — считывай это как обычное перечисление пунктов, а не как ошибку и не как один слитный пункт. Оценивай смысл и полноту, а не грамотность и оформление.\n\n'+
+      'В поле feedback никогда не пиши просто "неверно" без объяснения — если ответ неверный или неполный, кратко объясни, как правильно, и почему, своими словами (не цитируй эталон целиком). Верни строго JSON без пояснений вокруг: '+
+      '{"correct": true или false, "verdict_label": "точно" или "частично" или "неверно", "feedback": "доброжелательная обратная связь на русском, 2-4 предложения — что верно, что упущено и как правильно рассуждать"}',
+      {modelTier:'default', cache:false}
+    );
+
+    if(verdict.correct){
+      if(!isRetry) aiSession.correct++;
+      aiWeak[t.id] = Math.max(0,(aiWeak[t.id]||0)-1);
+    } else {
+      aiWeak[t.id] = (aiWeak[t.id]||0)+1;
+      if(!isRetry){
+        aiSession.wrongPending.push({ticket:t, question:question, userAnswer:userAnswer, feedback:verdict.feedback||''});
+        if(aiSession.wrongPending.length>6) aiSession.wrongPending.shift();
+      }
+    }
+    saveAiWeak();
+    aiSession.isRetry = false;
+    aiSession.lastAnswer = userAnswer;
+    aiSession.lastFeedback = verdict.feedback || '';
+
+    const cls = verdict.correct ? 'good' : 'bad';
+    const icon = verdict.correct ? '✓ ' : '✗ ';
+    document.getElementById('ai-feedback').innerHTML =
+      '<div class="ai-verdict '+cls+'"><b>'+icon+(verdict.verdict_label||(verdict.correct?'точно':'неверно'))+'</b>'+(verdict.feedback||'')+'</div>';
+    answerEl.hidden = true;
+    submit.hidden = true;
+    document.getElementById('ai-hint').hidden = true;
+    document.getElementById('ai-skip').hidden = true;
+
+    const fixRow = document.getElementById('ai-fix-row');
+    const next = document.getElementById('ai-next');
+    document.getElementById('ai-after-row').hidden = false;
+    if(aiSession.followupQueue.length>0){
+      fixRow.hidden = true;
+      next.hidden = false;
+      next.textContent = 'Дальше по разбору ('+aiSession.followupQueue.length+')';
+    } else if(verdict.correct){
+      aiSession.isFollowup = false;
+      fixRow.hidden = true;
+      next.hidden = false;
+      next.textContent = 'Следующий вопрос';
+    } else {
+      next.hidden = false;
+      if(aiSession.isFollowup){
+        aiSession.isFollowup = false;
+        fixRow.hidden = true;
+        next.textContent = 'Следующий вопрос';
+      } else {
+        fixRow.hidden = false;
+        next.textContent = 'Пропустить, дальше';
+      }
+    }
+    document.getElementById('ai-score').textContent = String(aiSession.correct);
+  }catch(err){
+    document.getElementById('ai-feedback').innerHTML =
+      '<div class="ai-verdict bad"><b>Ошибка</b>Не получилось проверить ответ ('+(err&&err.code||'ошибка')+'). Попробуй ещё раз.</div>';
+  }finally{
+    submit.disabled = false; submit.textContent = 'Ответить';
+  }
+}
+
+/* ---------- List ---------- */
+function renderList(filter){
+  const area = document.getElementById('list-area');
+  const f = (filter||'').trim().toLowerCase();
+  const items = TICKETS.filter(function(t){
+    return !f || (t.term+' '+t.def).toLowerCase().includes(f);
+  });
+  area.innerHTML = items.map(function(t){
+    return '<details class="ticket"><summary><span class="num">'+(t.id+1)+'</span>'+t.term+'</summary><div class="body">'+t.def+'</div></details>';
+  }).join('') || '<div style="color:var(--ink-soft);font-size:13px;">Ничего не найдено.</div>';
+}
+renderList('');
+document.getElementById('search').addEventListener('input', function(e){ renderList(e.target.value); });
+
+refreshStats();
+})();
+</script>
+
+</body>
+</html>
