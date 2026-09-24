@@ -338,6 +338,14 @@
         <label for="range-to">по</label>
         <input type="number" id="range-to" min="1" max="32" value="32">
       </div>
+      <div class="ai-keybox" id="ai-key-box" hidden>
+        <p class="ai-note">Чтобы ИИ работал вне claude.ai, нужен бесплатный ключ OpenRouter: зарегистрируйся на openrouter.ai, открой раздел Keys, создай ключ и вставь сюда. Ключ хранится только в этом браузере.</p>
+        <input class="search" id="ai-key" type="password" placeholder="Ключ OpenRouter (sk-or-...)" autocomplete="off">
+        <input class="search" id="ai-model" type="text" placeholder="Модель" autocomplete="off">
+        <p class="ai-note">Модель по умолчанию — автоподбор бесплатной. Если она перестанет отвечать, возьми любую с пометкой free на openrouter.ai/models.</p>
+        <button class="back-btn" id="ai-key-save">Сохранить ключ</button>
+      </div>
+      <button class="reset-link" id="ai-key-change" hidden style="align-self:flex-start;">Сменить ключ</button>
       <button class="next-btn" id="ai-start">Начать опрос</button>
     </div>
     <div class="ai-chat" id="ai-chat" hidden style="display:flex;flex-direction:column;gap:14px;">
@@ -655,12 +663,70 @@ try{
 function saveAiWeak(){ try{ localStorage.setItem('econ-ai-weak', JSON.stringify(aiWeak)); }catch(e){} }
 
 let aiSampleNS = null;
+function inClaude(){ return !!(window.claude && window.claude.use); }
+const DEFAULT_MODEL = 'openrouter/free';
+function getStored(k){ try{ return localStorage.getItem(k)||''; }catch(e){ return ''; } }
+function setStored(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+
+function makeKeySample(){
+  async function call(input){
+    const key = getStored('econ-or-key');
+    const model = getStored('econ-or-model') || DEFAULT_MODEL;
+    let r;
+    try{
+      r = await fetch('https://openrouter.ai/api/v1/chat/completions',{
+        method:'POST',
+        headers:{'Authorization':'Bearer '+key,'Content-Type':'application/json'},
+        body:JSON.stringify({model:model, messages:[{role:'user', content:input}]})
+      });
+    }catch(e){ const err = new Error('network'); err.code='network'; throw err; }
+    if(!r.ok){
+      const err = new Error('http');
+      err.code = r.status===401 ? 'неверный ключ' : r.status===429 ? 'rate_limited' : 'http_'+r.status;
+      throw err;
+    }
+    const j = await r.json();
+    return (j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || '';
+  }
+  const sample = async function(input){ return {text: await call(input), truncated:false}; };
+  sample.json = async function(input){
+    const t = await call(input);
+    const m = t.match(/\{[\s\S]*\}/);
+    if(!m){ const err = new Error('bad_json'); err.code='bad_json'; throw err; }
+    try{ return JSON.parse(m[0]); }catch(e){ const err = new Error('bad_json'); err.code='bad_json'; throw err; }
+  };
+  return sample;
+}
+
 async function ensureSample(){
   if(aiSampleNS) return aiSampleNS;
-  if(!(window.claude && window.claude.use)) return null;
-  aiSampleNS = await window.claude.use('sample');
-  return aiSampleNS;
+  if(inClaude()){
+    aiSampleNS = await window.claude.use('sample');
+    return aiSampleNS;
+  }
+  if(getStored('econ-or-key')){
+    aiSampleNS = makeKeySample();
+    return aiSampleNS;
+  }
+  return null;
 }
+
+function showKeyBox(){
+  document.getElementById('ai-key').value = getStored('econ-or-key');
+  document.getElementById('ai-model').value = getStored('econ-or-model') || DEFAULT_MODEL;
+  document.getElementById('ai-key-box').hidden = false;
+}
+if(!inClaude() && getStored('econ-or-key')) document.getElementById('ai-key-change').hidden = false;
+document.getElementById('ai-key-change').addEventListener('click', showKeyBox);
+document.getElementById('ai-key-save').addEventListener('click', function(){
+  const key = document.getElementById('ai-key').value.trim();
+  if(!key){ alert('Вставь ключ OpenRouter.'); return; }
+  setStored('econ-or-key', key);
+  setStored('econ-or-model', document.getElementById('ai-model').value.trim() || DEFAULT_MODEL);
+  aiSampleNS = null;
+  document.getElementById('ai-key-box').hidden = true;
+  document.getElementById('ai-key-change').hidden = false;
+});
 
 const aiSession = {count:0, correct:0, current:null, wrongPending:[], followupQueue:[]};
 
@@ -723,6 +789,7 @@ document.getElementById('ai-start').addEventListener('click', async function(){
     alert('В этом диапазоне нет билетов — проверь номера от 1 до '+TICKETS.length+'.');
     return;
   }
+  if(!inClaude() && !getStored('econ-or-key')){ showKeyBox(); return; }
   btn.disabled = true; btn.textContent = 'Загрузка…';
   const sample = await ensureSample();
   if(!sample){
