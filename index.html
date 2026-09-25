@@ -849,8 +849,20 @@ function stopMic(){ if(micRec && micListening){ try{ micRec.stop(); }catch(e){} 
   const btn = document.getElementById('ai-mic');
   const status = document.getElementById('ai-mic-status');
   if(!SpeechRec){ row.hidden = true; return; }
-  btn.addEventListener('click', function(){
+  const BLOCKED_MSG = 'Микрофон заблокирован. Во встроенном браузере Claude и на claude.ai микрофон не работает — открой сайт в Chrome, Edge или Яндекс Браузере. Если это уже обычный браузер, нажми на значок слева от адреса сайта и разреши микрофон.';
+  btn.addEventListener('click', async function(){
     if(micListening){ stopMic(); return; }
+    if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia){
+      status.textContent = 'Разреши доступ к микрофону в окне браузера…';
+      try{
+        const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+        stream.getTracks().forEach(function(t){ t.stop(); });
+        status.textContent = '';
+      }catch(err){
+        status.textContent = (err && err.name === 'NotFoundError') ? 'Микрофон не найден.' : BLOCKED_MSG;
+        return;
+      }
+    }
     const ta = document.getElementById('ai-answer');
     const base = ta.value.trim() ? ta.value.replace(/\s*$/, ' ') : '';
     let finalText = '';
@@ -869,7 +881,7 @@ function stopMic(){ if(micRec && micListening){ try{ micRec.stop(); }catch(e){} 
     };
     micRec.onerror = function(e){
       const msg = {
-        'not-allowed': 'Нет доступа к микрофону — разреши его в настройках браузера для этого сайта.',
+        'not-allowed': BLOCKED_MSG,
         'service-not-allowed': 'Браузер не даёт распознавать речь на этой странице. Открой сайт в Chrome или Edge.',
         'network': 'Сервис распознавания речи недоступен — проверь интернет или VPN.',
         'no-speech': 'Ничего не расслышал, попробуй ещё раз.',
