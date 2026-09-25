@@ -269,6 +269,10 @@
     background:var(--surface);color:var(--ink);font-family:inherit;font-size:14px;line-height:1.5;resize:vertical;
   }
   #ai-answer:focus{outline:2px solid var(--accent);outline-offset:1px;}
+  .mic-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  #ai-answer[hidden] + .mic-row{display:none;}
+  .mic-status{font-size:12px;color:var(--ink-soft);}
+  #ai-mic.listening{background:var(--accent-bg);color:var(--accent-ink);border-color:var(--accent);}
   .ai-verdict{border-radius:12px;padding:14px 16px;font-size:13.5px;line-height:1.55;}
   .ai-verdict b{display:block;margin-bottom:4px;text-transform:uppercase;font-size:11px;letter-spacing:.06em;}
   .ai-verdict.good{background:var(--good-bg);color:var(--good);border:1px solid var(--good-bg);}
@@ -355,6 +359,10 @@
       <div class="q-term" id="ai-question-card"></div>
       <div class="hint-card" id="ai-hint-card" hidden></div>
       <textarea id="ai-answer" placeholder="Напиши ответ своими словами…" hidden></textarea>
+      <div class="mic-row" id="ai-mic-row">
+        <button class="back-btn" id="ai-mic" type="button">Надиктовать ответ</button>
+        <span class="mic-status" id="ai-mic-status"></span>
+      </div>
       <div id="ai-feedback"></div>
       <div class="hint-card" id="ai-teach-card" hidden></div>
       <div class="quiz-nav" style="grid-template-columns:auto auto 1fr;">
@@ -832,7 +840,63 @@ document.getElementById('ai-exit').addEventListener('click', function(){
   aiSession.followupQueue = [];
 });
 
+const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+let micRec = null;
+let micListening = false;
+function stopMic(){ if(micRec && micListening){ try{ micRec.stop(); }catch(e){} } }
+(function(){
+  const row = document.getElementById('ai-mic-row');
+  const btn = document.getElementById('ai-mic');
+  const status = document.getElementById('ai-mic-status');
+  if(!SpeechRec){ row.hidden = true; return; }
+  btn.addEventListener('click', function(){
+    if(micListening){ stopMic(); return; }
+    const ta = document.getElementById('ai-answer');
+    const base = ta.value.trim() ? ta.value.replace(/\s*$/, ' ') : '';
+    let finalText = '';
+    micRec = new SpeechRec();
+    micRec.lang = 'ru-RU';
+    micRec.interimResults = true;
+    micRec.continuous = true;
+    micRec.onresult = function(e){
+      let interim = '';
+      for(let i = e.resultIndex; i < e.results.length; i++){
+        const t = e.results[i][0].transcript;
+        if(e.results[i].isFinal) finalText += t + ' ';
+        else interim += t;
+      }
+      ta.value = base + finalText + interim;
+    };
+    micRec.onerror = function(e){
+      const msg = {
+        'not-allowed': 'Нет доступа к микрофону — разреши его в настройках браузера для этого сайта.',
+        'service-not-allowed': 'Браузер не даёт распознавать речь на этой странице. Открой сайт в Chrome или Edge.',
+        'network': 'Сервис распознавания речи недоступен — проверь интернет или VPN.',
+        'no-speech': 'Ничего не расслышал, попробуй ещё раз.',
+        'audio-capture': 'Микрофон не найден.'
+      }[e.error] || ('Ошибка распознавания: ' + e.error);
+      status.textContent = msg;
+    };
+    micRec.onend = function(){
+      micListening = false;
+      btn.textContent = 'Надиктовать ответ';
+      btn.classList.remove('listening');
+      if(status.textContent === 'Говори, я записываю…') status.textContent = '';
+    };
+    try{
+      micRec.start();
+      micListening = true;
+      btn.textContent = 'Остановить запись';
+      btn.classList.add('listening');
+      status.textContent = 'Говори, я записываю…';
+    }catch(err){
+      status.textContent = 'Не получилось включить микрофон.';
+    }
+  });
+})();
+
 function nextAiQuestion(){
+  stopMic();
   const answerEl = document.getElementById('ai-answer');
   answerEl.value=''; answerEl.hidden = true;
   document.getElementById('ai-submit').hidden = true;
@@ -997,6 +1061,7 @@ document.getElementById('ai-teach').addEventListener('click', async function(){
 });
 
 async function aiSubmitAnswer(){
+  stopMic();
   const answerEl = document.getElementById('ai-answer');
   const userAnswer = answerEl.value.trim();
   if(!userAnswer) return;
