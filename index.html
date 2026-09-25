@@ -336,7 +336,7 @@
   <section id="tab-ai">
     <div class="ai-intro" id="ai-intro">
       <h2>Живой опрос с Claude</h2>
-      <p class="ai-note">Claude сам придумывает вопрос по одному из твоих билетов в той же прямой формулировке, что и на экзамене — не готовую фразу из Quizlet. Ты отвечаешь текстом, Claude проверяет по смыслу и чаще возвращается к билетам, где ты ошибаешься.</p>
+      <p class="ai-note">ИИ спрашивает билеты по порядку, от первого номера диапазона до последнего, потом начинает круг заново. Ты отвечаешь текстом или голосом, ИИ проверяет по смыслу и разбирает ошибки.</p>
       <div class="range-row">
         <label for="range-from">Спрашивать билеты с</label>
         <input type="number" id="range-from" min="1" max="32" value="1">
@@ -771,23 +771,8 @@ let aiRecentlyAsked = [];
 
 function pickWeightedTicket(){
   const pool = rangeTickets();
-  const cooldown = Math.min(aiRecentlyAsked.length, Math.max(0, pool.length-1));
-  const avoid = new Set(aiRecentlyAsked.slice(-cooldown));
-  let candidates = pool.filter(function(t){ return !avoid.has(t.id); });
-  if(candidates.length===0) candidates = pool;
-
-  const weights = candidates.map(function(t){ return (aiWeak[t.id]||0)*3 + 1; });
-  const total = weights.reduce(function(a,b){return a+b;},0);
-  let r = Math.random()*total;
-  let chosen = candidates[candidates.length-1];
-  for(let i=0;i<candidates.length;i++){
-    r -= weights[i];
-    if(r<=0){ chosen = candidates[i]; break; }
-  }
-
+  const chosen = pool[aiRecentlyAsked.length % pool.length];
   aiRecentlyAsked.push(chosen.id);
-  const maxHistory = Math.max(1, pool.length-1);
-  if(aiRecentlyAsked.length>maxHistory) aiRecentlyAsked = aiRecentlyAsked.slice(-maxHistory);
   return chosen;
 }
 
